@@ -46,13 +46,6 @@ function generateWorldMap(worldJSON) {
     .each(function(d, i) {
       d3.select(this).classed(d.id, true);
     })
-    /* On Mouse Enter */
-    .on("mouseover", function(d, i) {
-      if (d3.select(this).classed("countryIsInCurrentData")) {
-        highlightCountryInList(d.id, true);
-        highlightCountryOnMap(d.id, true);
-      }
-    })
     /* On Click */
     .on("click", function(d, i) {
       handleCountryClickShowDetail(d.id);
@@ -61,7 +54,7 @@ function generateWorldMap(worldJSON) {
     .on("mouseout", function(d, i) {
       if (d3.select(this).classed("countryIsInCurrentData")) {
         highlightCountryInList(d.id, false);
-        highlightCountryOnMap(d.id, false);
+        highlightCountryOnMap(null, d.id, false);
       }
     });
 }
@@ -81,16 +74,23 @@ function updateWorldMap(data, minimum, maximum) {
     })
     .classed("countryIsInCurrentData", true)
     .each(function(d) {
-      d3.select(this).style(
-        "fill",
-        calculateColorFromValue(
-          data[d.id][currentAttribute],
-          minimum[currentAttribute],
-          maximum[currentAttribute],
-          minColor,
-          maxColor
-        )
-      );
+      d3.select(this)
+        .style(
+          "fill",
+          calculateColorFromValue(
+            data[d.id][currentAttribute],
+            minimum[currentAttribute],
+            maximum[currentAttribute],
+            minColor,
+            maxColor
+        ))
+        /* On Mouse Enter */
+        .on("mouseover", function(d, i) {
+          if (d3.select(this).classed("countryIsInCurrentData")) {
+            highlightCountryInList(d.id, true);
+            highlightCountryOnMap(data[d.id], d.id, true);
+          }
+        });
     });
   updateLegend(data, minimum, maximum);
 }
@@ -99,16 +99,17 @@ function handleCountryClickShowDetail(CC) {
   zoomInCountry(CC);
 }
 
-function highlightCountryOnMap(CC, highlit) {
+function highlightCountryOnMap(data, CC, highlit) {
   if (!existsOnMap(CC))
     return;
-    
+
   if (highlit) {
     g.append("path")
       .attr("d", d3.select("." + CC).attr("d"))
       .classed("countryHighlight", true)
       .attr("id", CC + "-highlit")
       .attr("transform", d3.select("." + CC).attr("transform"))
+      .attr("style", "animation: pulse " + (60/data.tempo) + "s linear infinite");
     } else {
       d3.select("#" + CC + "-highlit")
       .remove();

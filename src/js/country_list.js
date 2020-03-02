@@ -15,10 +15,10 @@ function loadCountryList(data, cNames) {
     })
     .on("click", function(d) {})
     .on("mouseover", function(d, i) {
-      highlightCountryOnMap(d, true);
+      highlightCountryOnMap(data[d], d, true);
     })
     .on("mouseout", function(d, i) {
-      highlightCountryOnMap(d, false);
+      highlightCountryOnMap(null, d, false);
     });
 
   /* Insert span into li */

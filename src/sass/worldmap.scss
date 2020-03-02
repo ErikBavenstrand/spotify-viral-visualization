@@ -27,7 +27,6 @@
 
         .countryHighlight {
           stroke: lighten($spotify_green_color, 30);
-          stroke-width: 1;
           fill: none;
         }
 
@@ -37,4 +36,13 @@
       }
     }
   }
+}
+
+@keyframes pulse{
+	0%{
+		stroke-width: 3;
+	}
+	100%{
+    stroke-width: 1;
+	}
 }
