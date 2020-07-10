@@ -4,7 +4,7 @@ var globalLine = [];
 var countryColors = ["#ef4760", "#fdd161", "#2f8ba0"];
 var usedCountryColors = []; // one boolean per color
 // initialize colors to unused
-countryColors.forEach(function() {
+countryColors.forEach(function () {
   usedCountryColors.push(false);
 });
 
@@ -57,19 +57,19 @@ var margin = { top: 15, right: 30, bottom: 20, left: 50 },
 
 // set up scales for chart
 var xScale = d3
-    .scaleTime()
-    .domain([ new Date("2016-12-31"), new Date("2020-01-31") ])
-    .range([0, innerWidth]);
+  .scaleTime()
+  .domain([new Date("2016-12-31"), new Date("2020-01-31")])
+  .range([0, innerWidth]);
 
 var yScale = d3.scaleLinear().range([innerHeight, 0]);
 
 // generate a line model that will be applied to each set of data
 var lineModel = d3
   .line()
-  .x(function(d) {
+  .x(function (d) {
     return xScale(d.x);
   })
-  .y(function(d) {
+  .y(function (d) {
     return yScale(d.y);
   })
   .curve(d3.curveLinear); // strict straight lines between each data point
@@ -80,18 +80,18 @@ var lineModel = d3
   ==================================
 */
 
-function mapDataToLine(CC){
+function mapDataToLine(CC) {
   // turn dates/min/max object into an array
   // where each element holds the values of the keys
   var objVals = Object.values(data_attrs);
   var line = [];
   objVals
-    .filter(function(d, i) {
+    .filter(function (d, i) {
       // filter out the min and max data for the period
       // and keep the data corresponding to dates instead
       return i < objVals.length - 2;
     })
-    .map(function(d) {
+    .map(function (d) {
       // pick out the data from the right country
       // and the right attribute, avoid the weeks where
       // no data exists for selected country
@@ -101,7 +101,7 @@ function mapDataToLine(CC){
   line.reverse();
   // how many weeks should be skipped for this country
   var weeksOffset = weeks.length - line.length;
-  line = line.map(function(d, i) {
+  line = line.map(function (d, i) {
     // the index of the weeks-array (index 0 is last week)
     var wi = weeks.length - 1 - (i + weeksOffset);
     return { x: new Date(weeks[wi]), y: d };
@@ -116,18 +116,16 @@ function changeLineChartAttribute() {
 
   // if global data is already loaded, reload
   // it with the new attribute
-  if(globalLine.length == 1)
-    loadGlobalLineData();
+  if (globalLine.length == 1) loadGlobalLineData();
 
   prevCountryLines = chartCountryLines;
   // empty the array with countries' line data
   chartCountryLines = [];
-  prevCountryLines.forEach(function(lineObj) {
+  prevCountryLines.forEach(function (lineObj) {
     // re-add the countries with same colors
     // function call will load from selected attribute
     addCountryToLineChart(lineObj.CC, lineObj.color);
   });
-
 }
 
 function updateLineChartMinMax() {
@@ -137,21 +135,21 @@ function updateLineChartMinMax() {
   yScale.domain([lineAttrMinY, lineAttrMaxY]).nice();
 }
 
-function toggleGlobalLine(){
+function toggleGlobalLine() {
   // global line was inactive, add it
-  if(globalLine.length == 0){
+  if (globalLine.length == 0) {
     loadGlobalLineData();
     reloadLineChart();
-  }
-  else{ // global line was active, remove it
+  } else {
+    // global line was active, remove it
     globalLine = [];
     reloadLineChart();
   }
 }
 
-function loadGlobalLineData(){
+function loadGlobalLineData() {
   line = mapDataToLine("GLO");
-  globalLine = [ {"CC": "GLO", "data": line, "color": "#fff"} ];
+  globalLine = [{ CC: "GLO", data: line, color: "#fff" }];
 }
 
 function addCountryToLineChart(CC, usedColor) {
@@ -159,7 +157,7 @@ function addCountryToLineChart(CC, usedColor) {
 
   // find available color
   var colorIdx;
-  usedCountryColors.some(function(d, i) {
+  usedCountryColors.some(function (d, i) {
     // save any one that is free
     if (!d) {
       colorIdx = i;
@@ -184,7 +182,7 @@ function addCountryToLineChart(CC, usedColor) {
 
 function removeCountryFromLineChart(CC) {
   // update the array of lists and the colors used
-  chartCountryLines = chartCountryLines.filter(function(lineObj) {
+  chartCountryLines = chartCountryLines.filter(function (lineObj) {
     // the country code corresponds to the one to remove
     if (lineObj.CC == CC) {
       // mark its color as unused
@@ -207,7 +205,7 @@ function reloadLineChart() {
   // for dynamic y-axis if desired later (change countryLines to checking all 3)
   //yScale.domain(d3.extent(countryLines, function(d){return d.y;}))
 
-  chartCountryLines.forEach(function(lineObj) {
+  chartCountryLines.forEach(function (lineObj) {
     // add the line path itself
     drawLine(lineObj);
     // add dots (~scatter plot) for each data point
@@ -215,7 +213,7 @@ function reloadLineChart() {
   });
 
   // draw the global line and its data if it is active
-  if(globalLine.length === 1){
+  if (globalLine.length === 1) {
     drawLine(globalLine[0]);
     addDataPointDots(globalLine[0]);
   }
@@ -248,17 +246,14 @@ function createLineChart() {
       d3
         .axisBottom(xScale) // create the (x) axis component itself
         .ticks(d3.timeMonth.every(1)) //create one tick per month
-        .tickFormat(function(d, i) {
+        .tickFormat(function (d, i) {
           // only write a tick label when a new year is reached
           return i % 12 == 0 ? d3.timeFormat("%Y")(d) : "";
         })
     );
 
   //var yAxis =
-  chart
-    .append("g")
-    .attr("class", "y axis")
-    .call(d3.axisLeft(yScale)); // create the (y) axis component itself
+  chart.append("g").attr("class", "y axis").call(d3.axisLeft(yScale)); // create the (y) axis component itself
 
   // provide mouse over vertical line
   lineMarker = chart
@@ -286,7 +281,7 @@ function createLineChart() {
 function drawLine(lineObj) {
   // global variable stores the color directly
   // instead of an index to a color array
-  var global = (lineObj.CC === "GLO");
+  var global = lineObj.CC === "GLO";
 
   // append the line itself
   chart
@@ -301,7 +296,7 @@ function drawLine(lineObj) {
 function addGridLines() {
   // add grid lines to y-axis
   var yTicks = chart.selectAll(".y.axis > .tick");
-  yTicks.each(function() {
+  yTicks.each(function () {
     var l = d3
       .create("svg:line")
       .attr("class", "y-gridline")
@@ -314,7 +309,7 @@ function addGridLines() {
 function addDataPointDots(lineObj) {
   // global variable stores the color directly
   // instead of an index to a color array
-  var global = (lineObj.CC === "GLO");
+  var global = lineObj.CC === "GLO";
 
   // add one circle per data point
   chart
@@ -324,10 +319,10 @@ function addDataPointDots(lineObj) {
     .append("circle")
     .attr("class", "chart-dot chart-element-" + lineObj.CC) // Assign a class for styling
     .attr("opacity", "0.5")
-    .attr("cx", function(d) {
+    .attr("cx", function (d) {
       return xScale(d.x);
     })
-    .attr("cy", function(d) {
+    .attr("cy", function (d) {
       return yScale(d.y);
     })
     .attr("r", 3) // radius of 3px
@@ -347,13 +342,13 @@ function changeLineChartWeek() {
   // and transition out if not on line marker anymore
   var dots = chart
     .selectAll(".chart-dot")
-    .classed("focus", function(d) {
+    .classed("focus", function (d) {
       return +d.x == +xMouseVal;
     })
-    .classed("nonfocus", function(d) {
+    .classed("nonfocus", function (d) {
       return +d.x != +xMouseVal;
     });
-  dots.each(function(d) {
+  dots.each(function (d) {
     if (+d.x == +xMouseVal) {
       updateChartTooltip(d, currentDate);
     }

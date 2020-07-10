@@ -25,14 +25,8 @@ var worldPath = d3.geoPath().projection(worldProjection);
 var zoom = d3
   .zoom()
   .scaleExtent([1, 7])
-  .on("zoom", (function() {
+  .on("zoom", (function () {
     var t = d3.event.transform;
-
-    // adapt tooltip zoom to map zoom and scale it accordingly
-    updateTooltipScale(t.k);
-
-    // update the shown tooltip (scale of) as zoom is happening
-    if (tooltipRecent) showCountryTooltip(tooltipCC);
 
     var w_max = 0;
     var w_min = worldWidth * (1 - t.k);
@@ -46,48 +40,37 @@ var zoom = d3
   }));
 
 world.call(zoom);
-updateTooltipScale(1);
 
 function generateWorldMap(worldJSON) {
   /* Countries */
   g.selectAll("path")
-    .data(worldJSON.features, (function(d) {
+    .data(worldJSON.features, (function (d) {
       return d;
     }))
     .enter()
     .append("path")
     .attr("d", worldPath)
     .classed("defaultCountry", true)
-    .each((function(d, i) {
+    .each((function (d, i) {
       d3.select(this).classed(d.id, true);
     }))
     /* On Mouse Enter */
-    .on("mouseover", (function(d, i) {
+    .on("mouseover", (function (d, i) {
       if (d3.select(this).classed("countryIsInCurrentData")) {
         highlightCountryInList(d.id, true);
         highlightCountryOnMap(d.id, true);
-        setTimeout((function() {
-          hideCountryTooltip();
-        }), 500);
-        tooltipRecent = true;
-        showCountryTooltip(d.id);
-      } else {
-        // country outside of data so tooltip shouldn't show
-        hideCountryTooltip();
       }
     }))
     /* On Click */
-    .on("click", (function(d, i) {
+    .on("click", (function (d, i) {
       if (d3.select(this).classed("countryIsInCurrentData")) {
         countryClickSelection(d.id);
         handleCountryClickShowDetail(d.id);
       }
     }))
     /* On Mouse Out */
-    .on("mouseout", (function(d, i) {
+    .on("mouseout", (function (d, i) {
       if (d3.select(this).classed("countryIsInCurrentData")) {
-        highlightCountryInList(d.id, false);
-        highlightCountryOnMap(d.id, false);
       }
     }));
 }
@@ -102,15 +85,21 @@ function updateWorldMap(data, minimum, maximum) {
   d3.selectAll(".defaultCountry")
     .classed("countryIsInCurrentData", false)
     .style("fill", null)
-    .filter((function(d) {
-      return CCinData.indexOf(d.id) > -1;
+    .filter((function (d) {
+      return CCinData.indexOf(d.id) > -1 || CCinData.indexOf(d) > -1;
     }))
     .classed("countryIsInCurrentData", true)
-    .each((function(d) {
+    .each((function (d) {
+      var CC;
+      if (d.id) {
+        CC = d.id;
+      } else {
+        CC = d;
+      }
       d3.select(this).style(
         "fill",
         calculateColorFromValue(
-          data[d.id][currentAttribute],
+          data[CC][currentAttribute],
           minimum[currentAttribute],
           maximum[currentAttribute],
           minColor,
@@ -130,16 +119,42 @@ function highlightCountryOnMap(CC, highlit) {
   if (!existsOnMap(CC)) return;
 
   if (highlit) {
+    // Failsafe....
+    d3.select(".countryHoveredTrigger").each((function (d, i) {
+      highlightCountryOnMap(d, false);
+      highlightCountryInList(d, false);
+    }));
+
     g.append("path")
+      .data([CC])
       .attr("d", d3.select("." + CC).attr("d"))
+      .classed("defaultCountry", true)
       .classed("countryHighlight", true)
+      .classed("countryHoveredTrigger", true)
+      .classed(CC, true)
       .attr("id", CC + "-highlit")
-      .attr("transform", d3.select("." + CC).attr("transform"));
+      .attr("transform", d3.select("." + CC).attr("transform"))
+      .on("click", (function (d, i) {
+        countryClickSelection(d);
+        handleCountryClickShowDetail(d);
+      }))
+      .on("mouseout", (function (d, i) {
+        highlightCountryOnMap(d, false);
+        highlightCountryInList(d, false);
+      }));
+    d3.select("#" + CC + "-highlit").style(
+      "fill",
+      calculateColorFromValue(
+        data_attrs[dataWeek][CC][currentAttribute],
+        data_attrs.minimum[currentAttribute],
+        data_attrs.maximum[currentAttribute],
+        minColor,
+        maxColor
+      )
+    );
   } // remove the higlighting and tooltip
   else {
     d3.select("#" + CC + "-highlit").remove();
-    tooltipRecent = false;
-    hideCountryTooltip();
   }
 }
 
@@ -163,7 +178,7 @@ function zoomInCountry(CC) {
 
 function zoomOutCountryHideDetail(CC) {
   isInDetailView = false;
-  clearSelectedSongs();
+  setTimeout(clearSelectedSongs, 2000);
   toggleDetailViewVisibility();
   d3.event.stopPropagation();
 
@@ -184,50 +199,4 @@ function zoomOutCountryHideDetail(CC) {
     .transition()
     .duration(1500)
     .call(zoom.transform, d3.zoomIdentity.scale(1));
-}
-
-function showCountryTooltip(CC) {
-  tooltipCC = CC;
-  // round the data attribute to 3 decimal places
-  ttData = data_attrs[dataWeek][CC][currentAttribute].toFixed(3);
-  ttAttrName =
-    currentAttribute.charAt(0).toUpperCase() + currentAttribute.substring(1);
-  ttAttrHtml = ttAttrName + ": " + ttData;
-  // show country name and its data
-  countryTooltip.html(
-    "<strong>" + countryCCJSON[CC] + "</strong><br>" + ttAttrHtml
-  );
-  // fade the tooltip in
-  countryTooltip
-    .transition()
-    .delay(200)
-    .duration(200)
-    .style("opacity", "0.8");
-  // adapt the size of tooltip according to zoom
-  countryTooltip.style(
-    "transform",
-    "scale(" + tooltipZoom + "," + tooltipZoom + ")"
-  );
-  // get the current height and width of the tooltip
-  h = countryTooltip.style("height").slice(0, -2);
-  w = countryTooltip.style("width").slice(0, -2);
-  // center tooltip horizontally on mouse and place it above
-  x = d3.event.layerX - w / 2;
-  y = d3.event.layerY - h;
-  countryTooltip.style("left", x + "px").style("top", y + "px");
-}
-
-function hideCountryTooltip() {
-  if (!tooltipRecent) countryTooltip.style("opacity", "0");
-}
-
-function updateTooltipScale(zoom) {
-  // scale the tooltip according to screen height
-  screenBaseScale = Math.abs((worldHeight - 780) / 195);
-  // adapt tooltip zoom to map zoom and scale it accordingly
-  tooltipZoom =
-    (Math.log(zoom * 3) / (2.7 * 2.25 * Math.abs((800 - worldHeight) / 1080))) *
-    screenBaseScale;
-  // never scale down
-  if (tooltipZoom < 1) tooltipZoom = 1;
 }

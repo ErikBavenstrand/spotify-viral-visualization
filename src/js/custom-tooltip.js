@@ -1,15 +1,13 @@
 function loadTooltip() {
-  d3.select("#attribute-ul")
-    .append("span")
-    .classed("tooltip-content", true);
+  d3.select("#attribute-ul").append("span").classed("tooltip-content", true);
 
   var attr = d3
     .select("#attribute-ul")
     .selectAll("li")
-    .on("mouseover", function() {
+    .on("mouseover", function () {
       hoverTooltip(this);
     })
-    .on("mouseout", function(d) {
+    .on("mouseout", function (d) {
       leaveTooltip(this);
     });
 }

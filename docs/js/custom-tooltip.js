@@ -1,16 +1,14 @@
 /*! viral-50 v0.0.1 | (c) 2020 Erik Båvenstrand | MIT License | https://github.com/ErikBavenstrand/DH2321-Spotify-Project */
 function loadTooltip() {
-  d3.select("#attribute-ul")
-    .append("span")
-    .classed("tooltip-content", true);
+  d3.select("#attribute-ul").append("span").classed("tooltip-content", true);
 
   var attr = d3
     .select("#attribute-ul")
     .selectAll("li")
-    .on("mouseover", (function() {
+    .on("mouseover", (function () {
       hoverTooltip(this);
     }))
-    .on("mouseout", (function(d) {
+    .on("mouseout", (function (d) {
       leaveTooltip(this);
     }));
 }

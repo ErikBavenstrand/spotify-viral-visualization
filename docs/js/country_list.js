@@ -13,26 +13,23 @@ function loadCountryList(data, cNames) {
     .enter()
     .append("li")
     .classed("country-list-item", true)
-    .attr("id", (function(d) {
+    .attr("id", (function (d) {
       return "country-list-" + d;
     }))
-    .on("click", (function(d) {
+    .on("click", (function (d) {
       if (isInDetailView === false) {
         handleCountryClickShowDetail(d);
       }
       countryClickSelection(d);
       checkToggleListClickability();
-      if (selectedCountries.includes(d))
-        highlight(d);
-      else
-        dehighlight();
+      if (selectedCountries.includes(d)) highlight(d);
+      else dehighlight();
     }))
-    .on("mouseover", (function(d, i) {
+    .on("mouseover", (function (d, i) {
       highlightCountryOnMap(d, true);
-      if (selectedCountries.includes(d))
-        highlight(d);
+      if (selectedCountries.includes(d)) highlight(d);
     }))
-    .on("mouseout", (function(d, i) {
+    .on("mouseout", (function (d, i) {
       highlightCountryOnMap(d, false);
       dehighlight();
     }));
@@ -43,16 +40,16 @@ function loadCountryList(data, cNames) {
     .data(countries)
     .append("span")
     .attr("class", "country-code-list")
-    .text((function(d) {
+    .text((function (d) {
       return cNames[d];
     }));
 
   var options = {
-    valueNames: ["country-code-list"]
+    valueNames: ["country-code-list"],
   };
   var countryList = new List("list-wrapper", options);
   countryList.sort("country-code-list", {
-    order: "asc"
+    order: "asc",
   });
 }
 
@@ -65,11 +62,13 @@ function highlightCountryInList(CC, highlit) {
         .node()
         .scrollIntoView({
           block: "start",
-          behavior: "smooth"
+          behavior: "smooth",
         });
-    } catch (error) {/*
+    } catch (error) {
+      /*
       Prevents logging error when hovering
-      countries outside search results*/}
+      countries outside search results*/
+    }
   }
 }
 
@@ -77,7 +76,7 @@ function checkToggleListClickability() {
   if (selectedCountries.length == 3) {
     d3.select("#country-list-ul")
       .selectAll("li")
-      .each((function(d) {
+      .each((function (d) {
         if (selectedCountries.indexOf(d) === -1) {
           d3.select(this).classed("noSelect", true);
         }
@@ -85,7 +84,7 @@ function checkToggleListClickability() {
   } else {
     d3.select("#country-list-ul")
       .selectAll("li")
-      .each((function(d) {
+      .each((function (d) {
         if (selectedCountries.indexOf(d) === -1) {
           d3.select(this).classed("noSelect", false);
         }

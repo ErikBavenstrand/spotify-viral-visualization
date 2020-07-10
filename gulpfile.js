@@ -10,7 +10,7 @@ var settings = {
   styles: true,
   svgs: true,
   copy: true,
-  reload: true
+  reload: true,
 };
 
 /**
@@ -23,25 +23,25 @@ var paths = {
   scripts: {
     input: "src/js/*",
     polyfills: ".polyfill.js",
-    output: "docs/js/"
+    output: "docs/js/",
   },
   styles: {
     input: "src/sass/**/*.{scss,sass}",
-    output: "docs/css/"
+    output: "docs/css/",
   },
   svgs: {
     input: "src/svg/*.svg",
-    output: "docs/svg/"
+    output: "docs/svg/",
   },
   copy: {
     input: "src/copy/**/*",
-    output: "docs/"
+    output: "docs/",
   },
   data: {
     input: "src/data/**/*",
-    output: "docs/data/"
+    output: "docs/data/",
   },
-  reload: "./docs/"
+  reload: "./docs/",
 };
 
 /**
@@ -57,7 +57,7 @@ var banner = {
     " <%= package.author.name %>" +
     " | <%= package.license %> License" +
     " | <%= package.repository.url %>" +
-    " */\n"
+    " */\n",
 };
 
 /**
@@ -97,7 +97,7 @@ var browserSync = require("browser-sync");
  */
 
 // Remove pre-existing content from output folders
-var cleanDocs = function(done) {
+var cleanDocs = function (done) {
   // Make sure this feature is activated before running
   if (!settings.clean) return done();
 
@@ -120,13 +120,13 @@ var jsTasks = lazypipe()
   .pipe(dest, paths.scripts.output);
 
 // Lint, minify, and concatenate scripts
-var buildScripts = function(done) {
+var buildScripts = function (done) {
   // Make sure this feature is activated before running
   if (!settings.scripts) return done();
 
   // Run tasks on script files
   return src(paths.scripts.input).pipe(
-    flatmap(function(stream, file) {
+    flatmap(function (stream, file) {
       // If the file is a directory
       if (file.isDirectory()) {
         // Setup a suffix variable
@@ -140,7 +140,7 @@ var buildScripts = function(done) {
           // Grab files that aren't polyfills, concatenate them, and process them
           src([
             file.path + "/*.js",
-            "!" + file.path + "/*" + paths.scripts.polyfills
+            "!" + file.path + "/*" + paths.scripts.polyfills,
           ])
             .pipe(concat(file.relative + ".js"))
             .pipe(jsTasks());
@@ -162,7 +162,7 @@ var buildScripts = function(done) {
 };
 
 // Lint scripts
-var lintScripts = function(done) {
+var lintScripts = function (done) {
   // Make sure this feature is activated before running
   if (!settings.scripts) return done();
 
@@ -173,7 +173,7 @@ var lintScripts = function(done) {
 };
 
 // Process, lint, and minify Sass files
-var buildStyles = function(done) {
+var buildStyles = function (done) {
   // Make sure this feature is activated before running
   if (!settings.styles) return done();
 
@@ -182,15 +182,15 @@ var buildStyles = function(done) {
     .pipe(
       sass({
         outputStyle: "expanded",
-        sourceComments: true
+        sourceComments: true,
       })
     )
     .pipe(
       postcss([
         prefix({
           cascade: true,
-          remove: true
-        })
+          remove: true,
+        }),
       ])
     )
     .pipe(header(banner.main, { package: package }))
@@ -200,27 +200,25 @@ var buildStyles = function(done) {
       postcss([
         minify({
           discardComments: {
-            removeAll: true
-          }
-        })
+            removeAll: true,
+          },
+        }),
       ])
     )
     .pipe(dest(paths.styles.output));
 };
 
 // Optimize SVG files
-var buildSVGs = function(done) {
+var buildSVGs = function (done) {
   // Make sure this feature is activated before running
   if (!settings.svgs) return done();
 
   // Optimize SVG files
-  return src(paths.svgs.input)
-    .pipe(svgmin())
-    .pipe(dest(paths.svgs.output));
+  return src(paths.svgs.input).pipe(svgmin()).pipe(dest(paths.svgs.output));
 };
 
 // Copy static files into output folder
-var copyFiles = function(done) {
+var copyFiles = function (done) {
   // Make sure this feature is activated before running
   if (!settings.copy) return done();
 
@@ -229,7 +227,7 @@ var copyFiles = function(done) {
 };
 
 // Copy static data files into output folder
-var copyData = function(done) {
+var copyData = function (done) {
   // Make sure this feature is activated before running
   if (!settings.copy) return done();
 
@@ -238,15 +236,15 @@ var copyData = function(done) {
 };
 
 // Watch for changes to the src directory
-var startServer = function(done) {
+var startServer = function (done) {
   // Make sure this feature is activated before running
   if (!settings.reload) return done();
 
   // Initialize BrowserSync
   browserSync.init({
     server: {
-      baseDir: paths.reload
-    }
+      baseDir: paths.reload,
+    },
   });
 
   // Signal completion
@@ -254,14 +252,14 @@ var startServer = function(done) {
 };
 
 // Reload the browser when files change
-var reloadBrowser = function(done) {
+var reloadBrowser = function (done) {
   if (!settings.reload) return done();
   browserSync.reload();
   done();
 };
 
 // Watch for changes
-var watchSource = function(done) {
+var watchSource = function (done) {
   watch(paths.input, series(exports.default, reloadBrowser));
   done();
 };

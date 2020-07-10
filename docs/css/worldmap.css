@@ -39,14 +39,19 @@
   stroke-width: 0.1;
 }
 
-/* line 34, src/sass/worldmap.scss */
+/* line 35, src/sass/worldmap.scss */
 .world-detail .world-wrapper #world svg .countryHighlight {
-  stroke: rgba(255, 255, 255, 0.7);
+  stroke: rgba(255, 255, 255, 0.7) !important;
   stroke-width: 1;
-  fill: none;
+  stroke-linejoin: round;
 }
 
 /* line 40, src/sass/worldmap.scss */
+.world-detail .world-wrapper #world svg .countryHighlight:hover {
+  cursor: pointer;
+}
+
+/* line 45, src/sass/worldmap.scss */
 .world-detail .world-wrapper #world svg .countryIsInCurrentData {
   stroke: #121212;
 }

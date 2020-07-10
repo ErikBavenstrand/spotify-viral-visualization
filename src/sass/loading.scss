@@ -18,11 +18,11 @@
     display: flex;
     grid-area: 2 / 1 / 3;
     height: 100%;
-    opacity: 1.0;
+    opacity: 1;
     animation: logoPulse 0.7s infinite ease-in-out alternate;
   }
   /* 'LOADING' text */
-  h2 { 
+  h2 {
     z-index: 101;
     display: flex;
     align-self: flex-start;
@@ -37,7 +37,7 @@
 /* Animation of drawing the line path of the chart/graph */
 @keyframes logoPulse {
   from {
-    opacity: 1.0;
+    opacity: 1;
     height: 100%;
   }
   to {

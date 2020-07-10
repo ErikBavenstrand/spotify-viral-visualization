@@ -451,14 +451,15 @@
   margin: 0px;
 }
 
-
 /* Stripes of the bar chart and chips (songs) - normal */
-.song-bar-normal .song-bar-stripes, .song-chip.chip-normal {
+.song-bar-normal .song-bar-stripes,
+.song-chip.chip-normal {
   @include song-stripes-normal();
 }
 
 /* Stripes of the bar chart and chips (songs) - inverted */
-.song-bar-inverted .song-bar-stripes, .song-chip.chip-inverted {
+.song-bar-inverted .song-bar-stripes,
+.song-chip.chip-inverted {
   @include song-stripes-inverted();
 }
 

@@ -5,7 +5,7 @@ var attributes = [
   "acousticness",
   "instrumentalness",
   "liveness",
-  "valence"
+  "valence",
 ];
 function loadAttrList() {
   var ul = d3.select("#attribute-ul");
@@ -13,10 +13,10 @@ function loadAttrList() {
     .data(attributes)
     .enter()
     .append("li")
-    .text(function(d) {
+    .text(function (d) {
       return d;
     })
-    .on("click", function(d) {
+    .on("click", function (d) {
       currentAttribute = d;
       updateWorldMap(
         data_attrs[dataWeek],
@@ -26,7 +26,7 @@ function loadAttrList() {
       changeLineChartAttribute();
       ul.selectAll("li").style("color", null);
       d3.select(this).style("color", "#1ed760");
-      d3.select("#all-time-title").text(function() {
+      d3.select("#all-time-title").text(function () {
         return currentAttribute + " over time";
       });
     });

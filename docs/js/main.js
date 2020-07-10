@@ -13,12 +13,12 @@ var selectedCountries = [];
 var maxColor = {
   red: 30,
   green: 215,
-  blue: 96
+  blue: 96,
 };
 var minColor = {
   red: 30,
   green: 30,
-  blue: 100
+  blue: 100,
 };
 
 Promise.all([
@@ -26,8 +26,8 @@ Promise.all([
   d3.json("data/world_topology.json"),
   d3.json("data/world_country_zoom.json"),
   d3.json("data/countries.json"),
-  d3.json("data/week_countries_songs_normalized.json")
-]).then((function(files) {
+  d3.json("data/week_countries_songs_normalized.json"),
+]).then((function (files) {
   // save the loaded files and initialize the app
   filesLoaded = true;
   data_attrs = files[0];
@@ -41,8 +41,11 @@ Promise.all([
   loadCountryList(data_attrs[dataWeek], countryCCJSON);
   loadTimeSlider();
   // fade out and then remove the loading screen wrapper node
-  d3.select(".Loading__wrapper").transition()
+  d3.select(".Loading__wrapper")
+    .transition()
     .style("opacity", 0)
     .duration(800)
-    .on("end", (function(){ d3.select(this).remove(); }));
+    .on("end", (function () {
+      d3.select(this).remove();
+    }));
 }));
