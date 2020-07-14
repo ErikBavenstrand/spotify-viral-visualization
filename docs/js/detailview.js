@@ -16,6 +16,8 @@ var invertChip = [false, true, false, true, false, true];
 
 var lastDataWeek = 0;
 
+var clickedLink = false;
+
 function addCountryToDetailView(CC) {
   addCountryToWeeklySongs(CC);
   addCountryToLineChart(CC);
@@ -162,6 +164,10 @@ function changeWeeklySongsWeek(CC) {
         dehighlight();
       }))
       .on("click", (function (d) {
+        if (clickedLink) {
+          clickedLink = false;
+          return;
+        }
         // convert the song data to a string for consistent comparison
         var songAsKey = JSON.stringify(d);
         if (selectedSongs.includes(songAsKey)) {
@@ -231,7 +237,10 @@ function changeWeeklySongsWeek(CC) {
       .attr("href", (function (d) {
         return d.URL;
       }))
-      .attr("target", "_blank");
+      .attr("target", "_blank")
+      .on("click", (function (d) {
+        clickedLink = true;
+      }));
     // add fontawesome's icon for external links
     songLink.append("i").attr("class", "fas fa-external-link-alt");
     if (selectedSongs.length === 3) {
