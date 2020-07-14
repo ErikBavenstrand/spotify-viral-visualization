@@ -41,4 +41,11 @@ Promise.all([
   loadCountryList(data_attrs[dataWeek], countryCCJSON);
   loadTimeSlider();
   // fade out and then remove the loading screen wrapper node
+  d3.select(".Loading__wrapper")
+    .transition()
+    .style("opacity", 0)
+    .duration(800)
+    .on("end", (function () {
+      d3.select(this).remove();
+    }));
 }));
